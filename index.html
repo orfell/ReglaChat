@@ -12,7 +12,7 @@
     *{box-sizing:border-box}
     html,body{height:100%;margin:0}
     body{
-      display:flex; align-items:center; justify-content:center;
+      display:flex; align-items:center; justify-content:center; /* tarjeta centrada */
       background:var(--pastel); color:var(--text);
       font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif; line-height:1.45;
       padding:12px;
@@ -56,7 +56,7 @@
              src="https://www.unicomfacauca.edu.co/wp-content/themes/understrap-child-main/assets/img/logo.svg"
              alt="Logo institucional Unicomfacauca" width="512" height="160" />
         <h1>Asistente Virtual Unicomfacauca</h1>
-        <p>Hablas con el asistente del Reglamento Estudiantil.</p>
+        <p>Hablas con JULIUS, el asistente del Reglamento Estudiantil.</p>
       </header>
 
       <section class="body-text">
@@ -70,28 +70,37 @@
     </footer>
   </main>
 
-  <!-- Widget oficial de ElevenLabs -->
-  <elevenlabs-convai id="convai" agent-id="agent_5901k43j8mnne8psczk9n22gnfj2"></elevenlabs-convai>
-
-  <!-- Usa la librería moderna desde jsDelivr (mejor que unpkg para este widget) -->
-  <script src="https://cdn.jsdelivr.net/npm/@elevenlabs/convai-widget@latest/dist/convai-widget.js" async></script>
+  <!-- ÚNICO widget oficial de ElevenLabs -->
+  <elevenlabs-convai agent-id="agent_9401k4x01n1hf4ha5hs0fmv2wdmf"></elevenlabs-convai>
+  <script src="https://unpkg.com/@elevenlabs/convai-widget-embed" async type="text/javascript"></script>
 
   <script>
-    // Localiza el texto del botón del widget a "Iniciar llamada" cuando esté disponible
+    // Intenta poner el texto del botón en español ("Iniciar llamada") si el widget lo expone
     function localizeWidgetButton() {
+      // Buscar en DOM “normal”
       let btn = document.querySelector('button[aria-label="Start a call"], button[aria-label="Open call"]');
       if (!btn) {
-        const host = document.getElementById('convai');
-        if (host && host.shadowRoot) btn = host.shadowRoot.querySelector('button,[role="button"]');
+        // Buscar en shadow DOM del elemento <elevenlabs-convai>
+        const host = document.querySelector('elevenlabs-convai');
+        if (host && host.shadowRoot) {
+          btn = host.shadowRoot.querySelector('button, [role="button"]');
+        }
       }
       if (!btn) return;
-      btn.setAttribute('aria-label','Iniciar llamada');
-      const label = Array.from(btn.querySelectorAll('span,div,strong,p')).find(n => (n.textContent||'').trim().length>0);
-      if (label) label.textContent = 'Iniciar llamada';
+
+      // Cambiar aria-label y el texto si hay un nodo de texto visible
+      btn.setAttribute('aria-label', 'Iniciar llamada');
+      const labelNode = Array.from(btn.querySelectorAll('span,div,strong,p'))
+        .find(n => (n.textContent || '').trim().length > 0);
+      if (labelNode) labelNode.textContent = 'Iniciar llamada';
     }
+
+    // Observa cuando cargue/re-renderice el widget y aplica la localización
     const mo = new MutationObserver(localizeWidgetButton);
-    mo.observe(document.documentElement, { childList:true, subtree:true });
-    addEventListener('load', () => {
+    mo.observe(document.documentElement, { childList: true, subtree: true });
+
+    // Intentos escalonados por si el widget tarda en montar
+    window.addEventListener('load', () => {
       setTimeout(localizeWidgetButton, 400);
       setTimeout(localizeWidgetButton, 1000);
       setTimeout(localizeWidgetButton, 2000);
@@ -101,4 +110,6 @@
   <noscript>Habilita JavaScript para usar ReglaChat.</noscript>
 </body>
 </html>
+
+
 
