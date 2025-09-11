@@ -12,7 +12,7 @@
     *{box-sizing:border-box}
     html,body{height:100%;margin:0}
     body{
-      display:flex; align-items:center; justify-content:center; /* tarjeta centrada */
+      display:flex; align-items:center; justify-content:center;
       background:var(--pastel); color:var(--text);
       font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif; line-height:1.45;
       padding:12px;
@@ -70,37 +70,28 @@
     </footer>
   </main>
 
-  <!-- ÚNICO widget oficial de ElevenLabs -->
+  <!-- Widget oficial de ElevenLabs -->
   <elevenlabs-convai id="convai" agent-id="agent_5901k43j8mnne8psczk9n22gnfj2"></elevenlabs-convai>
-  <script src="https://unpkg.com/@elevenlabs/convai-widget-embed" async type="text/javascript"></script>
+
+  <!-- Usa la librería moderna desde jsDelivr (mejor que unpkg para este widget) -->
+  <script src="https://cdn.jsdelivr.net/npm/@elevenlabs/convai-widget@latest/dist/convai-widget.js" async></script>
 
   <script>
-    // Intenta poner el texto del botón en español ("Iniciar llamada") si el widget lo expone
+    // Localiza el texto del botón del widget a "Iniciar llamada" cuando esté disponible
     function localizeWidgetButton() {
-      // Buscar en DOM “normal”
       let btn = document.querySelector('button[aria-label="Start a call"], button[aria-label="Open call"]');
       if (!btn) {
-        // Buscar en shadow DOM del elemento <elevenlabs-convai>
         const host = document.getElementById('convai');
-        if (host && host.shadowRoot) {
-          btn = host.shadowRoot.querySelector('button, [role="button"]');
-        }
+        if (host && host.shadowRoot) btn = host.shadowRoot.querySelector('button,[role="button"]');
       }
       if (!btn) return;
-
-      // Cambiar aria-label y el texto si hay un nodo de texto visible
-      btn.setAttribute('aria-label', 'Iniciar llamada');
-      // Busca posibles spans/labels de texto dentro del botón
-      const labelNode = Array.from(btn.querySelectorAll('span,div,strong,p')).find(n => (n.textContent || '').trim().length > 0);
-      if (labelNode) labelNode.textContent = 'Iniciar llamada';
+      btn.setAttribute('aria-label','Iniciar llamada');
+      const label = Array.from(btn.querySelectorAll('span,div,strong,p')).find(n => (n.textContent||'').trim().length>0);
+      if (label) label.textContent = 'Iniciar llamada';
     }
-
-    // Observa cuando cargue/re-renderice el widget y aplica la localización
     const mo = new MutationObserver(localizeWidgetButton);
-    mo.observe(document.documentElement, { childList: true, subtree: true });
-
-    // Intentos escalonados por si el widget tarda en montar
-    window.addEventListener('load', () => {
+    mo.observe(document.documentElement, { childList:true, subtree:true });
+    addEventListener('load', () => {
       setTimeout(localizeWidgetButton, 400);
       setTimeout(localizeWidgetButton, 1000);
       setTimeout(localizeWidgetButton, 2000);
@@ -110,3 +101,4 @@
   <noscript>Habilita JavaScript para usar ReglaChat.</noscript>
 </body>
 </html>
+
